@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+    
+    triggers{
+        
+        pollSCM('H/2 * * * *')
+    }
+    
+    environment {
+        DOCKERHUB_USERNAME = 'govardhan99'
+        DOCKERHUB_PASSWORD = 'Giridhar@99'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch:'master', url:'https://github.com/bhaskarini99/freshtaskjen.git'
+            }
+        }
+
+       stage ('credentials') {
+            steps {
+                    echo "Logging in to Docker Hub..."
+                    bat """
+                    docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+                    """
+                }
+            }
+        
+        stage ('Build Docker Image') {
+            steps {
+                    echo "Building Docker image..." 
+                        bat 'docker build -t jenkinsimg .'
+                        bat ' docker rm -f jenkinsimage12 ||true'
+                        bat 'docker run -d --name jenkinsimage12 -p 8026:80 jenkinsimg'
+                }
+            }
+         stage ('pulling the changes') {
+                steps {
+                    dir('C:\\project11') {
+                        bat '''
+                        git config --global --add safe.directory C:/project11
+                        git pull https://github.com/bhaskarini99/freshtaskjen.git master 
+                        '''
+        }
+    }
+}
+}
+}
